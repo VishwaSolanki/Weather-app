@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+  <div class="bg-white/50 backdrop-blur-xl rounded-3xl shadow-lg p-8 max-w-sm w-full text-center border border-white/30">
+    <h1 class="text-3xl font-bold mb-6">☁️ Weather App</h1>
+
+    <div class="flex items-center gap-2 mb-6">
+      <input type="text" id="cityInput"
+             class="w-full p-3 rounded-xl bg-white/60 text-gray-700 placeholder-gray-400 outline-none shadow-sm"
+             placeholder="Enter city name" />
+      <button onclick="getWeather()"
+              class="bg-pink-300 text-white font-medium px-4 py-2 rounded-xl hover:bg-pink-400 transition shadow">
+        Get
+      </button>
+    </div>
+
+    <div id="weatherInfo" class="space-y-3 text-gray-700 text-sm">
+      <!-- Weather details will be injected here -->
+    </div>
+  </div>
+
+  <script>
+
+    
+async function getWeather() {
+  const city = document.getElementById('cityInput').value.trim();
+  const apiKey = 'b4e0fe7807dd6d616252e04e8deee82a';
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+  const weatherBox = document.getElementById('weatherInfo');
+  weatherBox.innerHTML = `<p>Loading...</p>`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("City not found");
+
+    const data = await res.json();
+
+    const { name } = data;
+    const { country } = data.sys;
+    const { temp, humidity } = data.main;
+    const { main, icon } = data.weather[0];
+    const { speed } = data.wind;
+
+    weatherBox.innerHTML = `
+      <h2 class="text-xl font-bold text-gray-800">${name}, ${country}</h2>
+      <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="${main}" class="mx-auto" />
+      <p class="text-xl">🌡️ Temp: ${temp}°C</p>
+      <p>🌥️ Weather: ${main}</p>
+      <p>💧 Humidity: ${humidity}%</p>
+      <p>🌬️ Wind Speed: ${speed} m/s</p>
+    `;
+  } catch (err) {
+    weatherBox.innerHTML = `<p class="text-red-300 font-semibold">${err.message}</p>`;
+  }
+}
+
+document.getElementById("cityInput").addEventListener("keydown", function (event) {
+if (event.key === "Enter") {
+getWeather();
+}
+});
+
+  </script>
+</body>
+</html>
